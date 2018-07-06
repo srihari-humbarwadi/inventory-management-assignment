@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% block body %}
+{% from "includes/_formhelper.html" import render_field %}
+<div class="container-fluid" style="position: absolute;top: 20%;bottom: 30%">
+        <form method="POST" action="">
+                <h1 class="text-center">Add Record</h1>
+
+                <div class="form-group row ">
+                	<div class="col-lg-5 col-sm-8 mx-auto">
+                	{{render_field(form.name, class='form-control ')}}
+			</div>                
+                </div>
+
+                <div class="form-group row">
+                	<div class="col-lg-5 col-sm-8 mx-auto">
+                	{{render_field(form.vendor, class='form-control')}}
+			</div>                
+                </div> 
+
+                <div class="form-group row">
+                	<div class="col-lg-5 col-sm-8 mx-auto">
+                	{{render_field(form.mrp, class='form-control')}}
+			</div>                
+                </div>
+
+                <div class="form-group row">
+                	<div class="col-lg-5 col-sm-8 mx-auto">
+                	{{render_field(form.quantity, class='form-control')}}
+			</div>                
+                </div>
+
+                <div class="form-group row">
+                        <div class="col-lg-5 col-sm-8 mx-auto">
+                        {{render_field(form.batch_num, class='form-control')}}
+                        </div>                
+                </div>
+
+                <div class="form-group row">
+                        <div class="col-lg-5 col-sm-8 mx-auto">
+                        {{render_field(form.batch_date, class='form-control datepicker')}}
+                        </div>                
+                </div>
+                <div class="form-group row">
+                <input type="submit" class="btn btn-primary mx-auto col-lg-2 col-sm-8" value="Add">        
+                </div>
+        </form>
+</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+$(document).ready(function(){
+        console.log('making request')
+        $('form').on('submit', function(event){
+                $.ajax({
+                        type : 'POST',
+                        data : {
+                                'name' : $('#name').val(),
+                                'vendor' : $('#vendor').val(),
+                                'mrp' : $('#mrp').val(),
+                                'batch_num' : $('#batch_num').val(),
+                                'batch_date' : $('#batch_date').val(),
+                                'quantity' : $('#quantity').val()
+                        },
+                        url : '/api/addrecord/assistant/'
+                }).done(function(data){
+                        console.log(data)
+                });
+                event.preventDefault();
+        });
+});
+
+</script>
+{% endblock %}

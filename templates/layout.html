@@ -11,7 +11,7 @@
     </head>
     <body>
         <nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark">
-          <a class="navbar-brand" href="#">Zeus Inventory Management</a>
+          <a class="navbar-brand" href="/">Zeus Inventory Management</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -19,9 +19,12 @@
             <div class="navbar-nav">
               <a class="nav-item nav-link" href="/">Home</a>
             {% if session.logged_in %}
-              <a class="nav-item nav-link" href="/Products">Products</a>
+              <a class="nav-item nav-link" href="/products">Products</a>
+              <a class="nav-item nav-link" href="/add"> Add Record</a>
+              <a class="nav-item nav-link" href="/view"> View Records</a>
+              <a class="nav-item nav-link" href="/view/pending">Pending Records</a>
             {% endif %}
-              <a class="nav-item nav-link" href="/About">About</a>
+              <a class="nav-item nav-link" href="/pbout">About</a>
             }
             </div>
             <div class="navbar-nav ml-auto">
@@ -36,9 +39,11 @@
         </nav>
         <br>
 		{% include 'includes/_messages.html'%}
-    	{% block body %}{% endblock %}
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    	{% block body %}
+<!-- 		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    {% endblock %}
     </body>
 </html>
