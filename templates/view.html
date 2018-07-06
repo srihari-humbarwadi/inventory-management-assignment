@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% block body %}
+{% from "includes/_formhelper.html" import render_field %}
+
+<div class="container col-lg-10">
+<table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Vendor</th>
+                <th>Batch Number</th>
+                <th>Batch Date</th>
+                <th>Cost</th>
+                <th>Quantity</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function() {
+                $('#example').DataTable( {
+                    "ajax": {
+                        "url": "/api/get/",
+                        "dataSrc": ""
+                    },
+                    "columns": [
+                        { "data": "id" },
+                        { "data": "name" },
+                        { "data": "vendor" },
+                        { "data": "batch_num" },
+                        { "data": "batch_date" },
+                        { "data": "mrp" },
+                        { "data": "quantity" },
+                        { "data": "status" }
+                    ]
+                } );
+            } );
+</script>
+
+{% endblock %}

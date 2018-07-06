@@ -189,17 +189,38 @@ def login():
 			error = 'Invalid username/password'
 			return render_template('login.html', error=error, form=form)
 	return render_template('login.html', form=form)
+	
 
 @app.route('/view')
 @is_logged_in
 def view():
-	return "view all"
+	return render_template('view.html')
 
 
 @app.route('/view/pending')
-@is_manager
+@is_logged_in
 def viewpending():
-	return "view pending"
+	return render_template('view_pending.html')
+
+
+@app.route('/api/get/')
+@is_logged_in
+def get():
+	cur = mysql.connection.cursor()
+	results = cur.execute('SELECT * FROM products')
+	data = cur.fetchall()
+	cur.close()
+	return jsonify(data)
+
+
+@app.route('/api/get/pending/')
+@is_logged_in
+def getpending():
+	cur = mysql.connection.cursor()
+	results = cur.execute('SELECT * FROM products WHERE status = %s', ['Pending Approval'])
+	data = cur.fetchall()
+	cur.close()
+	return jsonify(data)
 
 
 @app.route('/logout')
