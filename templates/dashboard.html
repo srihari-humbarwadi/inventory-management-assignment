@@ -3,4 +3,18 @@
 <div class="container col-lg-12">
 <h1 class="display-3">Welcome {{session['username']}},</h1>
 </div>
+<div class="container">
+	<div class="card text-center">
+	<div class="card-header">
+	Navigation
+	</div>
+	<div class="card-body">
+	<h5 class="card-title">Useful links</h5>
+	<p class="card-text">Simple and easy to use inventory management with Flask backend</p>
+	<a href="/add" class="btn btn-primary">add new records</a>
+	<a href="/view" class="btn btn-primary">all records</a>
+	<a href="#" class="btn btn-primary">pending records</a>
+	</div>
+	</div>
+</div>
 {% endblock %}
