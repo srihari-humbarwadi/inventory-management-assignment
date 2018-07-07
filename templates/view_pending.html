@@ -2,8 +2,8 @@
 {% block body %}
 {% from "includes/_formhelper.html" import render_field %}
 
-<div class="container col-lg-10">
-<table id="example" class="display" style="width:100%">
+<div class="container col-lg-10 col-md 12 col-sm-12 col-xs-12">
+<table id="example" class="row-border hover" style="width:100%">
         <thead>
             <tr>
                 <th>ID</th>
@@ -14,6 +14,9 @@
                 <th>Cost</th>
                 <th>Quantity</th>
                 <th>Status</th>
+                {% if role == 0 %}
+                    <th></th>
+                {% endif %}
                 <th></th>
                 <th></th>
             </tr>
@@ -25,6 +28,7 @@
     <script type="text/javascript">
             $(document).ready(function() {
                 $('#example').DataTable( {
+                    "responsive": true,
                     "ajax": {
                         "url": "/api/get/pending/",
                         "dataSrc": ""
@@ -38,15 +42,61 @@
                         { "data": "mrp" },
                         { "data": "quantity" },
                         { "data": "status" },
-                        { "data": null,"defaultContent": "<button id='delete' class='btn btn-primary' >Delete</button>"},
-                        { "data": null,"defaultContent": "<button id ='modify' class='btn btn-success' >Modify</button>"}
+                        {% if role == 0%}
+                            { "data": null,"defaultContent": "<button id ='approve' class='btn btn-sm btn-success' >Approve</button>"},
+                        {% endif %}
+                        { "data": null,"defaultContent": "<button id ='modify' class='btn btn-sm btn-warning' >Modify</button>"},
+                        { "data": null,"defaultContent": "<button id='delete' class='btn btn-sm btn-danger' >Delete</button>"}
+
                     ]
                 } );
                 var table = $('#example').DataTable();
+
+
                 $('#example tbody').on( 'click', '#delete', function () {
-                    console.log('delete clicked')
+                    console.log('approve clicked')
+                    data = table.row( $(this).parents('tr') ).data();
+                    id = data['id']
+                    name = data['name']
+                    $.ajax({
+                            type : 'POST',
+                            data : JSON.stringify({
+                                    'name': name,
+                                    'id': id
+                            }),
+                            contentType: "application/json",
+                            url : '/api/delete/'
+                    }).done(function(data){
+                        if (data['status'] == 'ok'){
+                            window.location = '/view'
+                        }
+                        console.log(data)
+                    });
                     console.log( table.row( $(this).parents('tr') ).data() );
                 } );
+
+                $('#example tbody').on( 'click', '#approve', function () {
+                    console.log('approve clicked')
+                    data = table.row( $(this).parents('tr') ).data();
+                    id = data['id']
+                    name = data['name']
+                    $.ajax({
+                            type : 'POST',
+                            data : JSON.stringify({
+                                    'name': name,
+                                    'id': id
+                            }),
+                            contentType: "application/json",
+                            url : '/api/approve/'
+                    }).done(function(data){
+                        if (data['status'] == 'ok'){
+                            window.location = '/view'
+                        }
+                        console.log(data)
+                    });
+                    console.log( table.row( $(this).parents('tr') ).data() );
+                } );
+
                 $('#example tbody').on( 'click', '#modify', function () {
                     console.log('Modify clicked');
                     data = table.row( $(this).parents('tr') ).data();

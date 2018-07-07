@@ -4,8 +4,10 @@ from wtforms.fields.html5 import DateField
 from wtforms import Form, StringField, TextAreaField, PasswordField, FloatField, IntegerField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
+from flask_json import FlaskJSON, JsonError, json_response, as_json
 
 app = Flask(__name__)
+FlaskJSON(app)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
@@ -98,18 +100,20 @@ def add():
 @app.route('/api/addrecord/', methods=['POST'])
 @is_manager
 def addrecord():
-	name = request.form['name']
-	vendor = request.form['vendor']
-	mrp = request.form['mrp']
-	batch_num = request.form['batch_num']
-	batch_date = request.form['batch_date']
-	quantity = request.form['quantity']
+	content = request.get_json()
+	name = content['name']
+	vendor = content['vendor']
+	mrp = content['mrp']
+	batch_num = content['batch_num']
+	batch_date = content['batch_date']
+	quantity = content['quantity']
 	status = 'Approved'
 	cur = mysql.connection.cursor()
 	cur.execute('INSERT INTO products(name, vendor, mrp, batch_num, batch_date, quantity, status) VALUES(%s, %s, %s, %s, %s, %s, %s)', (name, vendor, mrp, batch_num, batch_date, quantity, status))
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
+		'status' : 'ok',
 		'name' : name,
 		'vendor' : vendor,
 		'mrp' : mrp,
@@ -119,21 +123,24 @@ def addrecord():
 		'status' : status
 		})
 
+
 @app.route('/api/addrecord/assistant/', methods=['POST'])
 @is_logged_in
 def addrecordassistant():
-	name = request.form['name']
-	vendor = request.form['vendor']
-	mrp = request.form['mrp']
-	batch_num = request.form['batch_num']
-	batch_date = request.form['batch_date']
-	quantity = request.form['quantity']
-	status = 'Pending Approval'
+	content = request.get_json()
+	name = content['name']
+	vendor = content['vendor']
+	mrp = content['mrp']
+	batch_num = content['batch_num']
+	batch_date = content['batch_date']
+	quantity = content['quantity']
+	status = 'Pending Addition'
 	cur = mysql.connection.cursor()
 	cur.execute('INSERT INTO products(name, vendor, mrp, batch_num, batch_date, quantity, status) VALUES(%s, %s, %s, %s, %s, %s, %s)', (name, vendor, mrp, batch_num, batch_date, quantity, status))
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
+		'status' : 'ok',
 		'name' : name,
 		'vendor' : vendor,
 		'mrp' : mrp,
@@ -194,13 +201,23 @@ def login():
 @app.route('/view')
 @is_logged_in
 def view():
-	return render_template('view.html')
+	cur = mysql.connection.cursor()
+	current_user = session['username']
+	result = cur.execute('SELECT * from users WHERE username = %s', [current_user])
+	user = cur.fetchone()
+	user_role = user['role']
+	return render_template('view.html', role=user_role)
 
 
 @app.route('/view/pending')
 @is_logged_in
 def viewpending():
-	return render_template('view_pending.html')
+	cur = mysql.connection.cursor()
+	current_user = session['username']
+	result = cur.execute('SELECT * from users WHERE username = %s', [current_user])
+	user = cur.fetchone()
+	user_role = user['role']
+	return render_template('view_pending.html', role=user_role)
 
 
 @app.route('/modify/<id>/<name>')
@@ -231,15 +248,17 @@ def modify(id, name):
 @app.route('/api/modifyrecord/', methods=['POST'])
 @is_manager
 def modifyrecord():
-	name = request.form['name']
-	vendor = request.form['vendor']
-	quantity = request.form['quantity']
+	content = request.get_json()
+	name = content['name']
+	vendor = content['vendor']
+	quantity = content['quantity']
 	status = 'Approved'
 	cur = mysql.connection.cursor()
 	cur.execute('UPDATE products SET quantity = %s, status = %s WHERE name = %s AND vendor = %s', [quantity, status, name, vendor])
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
+		'status' : 'ok',
 		'name' : name,
 		'quantity' : quantity,
 		'status' : status
@@ -248,15 +267,17 @@ def modifyrecord():
 @app.route('/api/modifyrecord/assistant/', methods=['POST'])
 @is_logged_in
 def modifyrecordassistant():
-	name = request.form['name']
-	vendor = request.form['vendor']
-	quantity = request.form['quantity']
-	status = 'Pending Approval'
+	content = request.get_json()
+	name = content['name']
+	vendor = content['vendor']
+	quantity = content['quantity']
+	status = 'Pending modification'
 	cur = mysql.connection.cursor()
 	cur.execute('UPDATE products SET quantity = %s, status = %s WHERE name = %s AND vendor = %s', [quantity, status, name, vendor])
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
+		'status' : 'ok',
 		'name' : name,
 		'quantity' : quantity,
 		'status' : status
@@ -297,6 +318,75 @@ def logout():
 def inventory():
 	return render_template('inventory.html')
 
+
+
+@app.route('/api/approve/', methods=['POST'])
+@is_manager
+def approve():
+	content = request.get_json()
+	name = content['name']
+	id = content['id']
+	cur = mysql.connection.cursor()
+	results = cur.execute('SELECT * FROM products WHERE id = %s AND name = %s',[id, name])
+	data = cur.fetchone()
+	curr_status = data['status']
+	status = 'Approved'
+	if curr_status != status:
+		if curr_status == 'Pending deletion':
+			cur.execute('DELETE FROM products WHERE id = %s AND name = %s',[id, name])
+			mysql.connection.commit()
+			cur.close()
+			return jsonify({
+				'status':'ok'
+				})
+		else:
+			cur.execute('UPDATE products SET status = %s WHERE id = %s AND name = %s', [status, id, name])
+			mysql.connection.commit()
+			cur.close()
+			return jsonify({
+				'status': 'ok'
+				})
+	else:
+		return jsonify({
+			'status':'already approved'
+			})
+
+
+
+@app.route('/api/delete/', methods=['POST'])
+@is_logged_in
+def delete():
+	content = request.get_json()
+	name = content['name']
+	id = content['id']
+	cur = mysql.connection.cursor()
+	results = cur.execute('SELECT * FROM products WHERE id = %s AND name = %s',[id, name])
+	data = cur.fetchone()
+	curr_status = data['status']
+	current_user = session['username']
+	uresult = cur.execute('SELECT * from users WHERE username = %s', [current_user])
+	user = cur.fetchone()
+	user_role = user['role']
+	if user_role == 0:
+		cur.execute('DELETE FROM products WHERE id = %s AND name = %s',[id, name])
+		mysql.connection.commit()
+		cur.close()
+		return jsonify({
+			'status':'ok'
+			})
+	elif user_role == 1:
+		status = 'Pending deletion'
+		if curr_status != status:
+			cur.execute('UPDATE products SET status = %s WHERE id = %s AND name = %s', [status, id, name])
+			mysql.connection.commit()
+			cur.close()
+			return jsonify({
+				'status':'ok'
+			})
+		else:
+			return jsonify({
+				'status':'already marked for deletion'
+				})
 
 if __name__ == '__main__':
 	app.secret_key = 'isthissafe?'

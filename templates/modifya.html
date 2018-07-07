@@ -53,14 +53,15 @@ $(document).ready(function(){
         $('form').on('submit', function(event){
                 $.ajax({
                         type : 'POST',
-                        data : {
+                        data : JSON.stringify({
                                 'name' : $('#name').val(),
                                 'vendor' : $('#vendor').val(),
                                 'mrp' : $('#mrp').val(),
                                 'batch_num' : $('#batch_num').val(),
                                 'batch_date' : $('#batch_date').val(),
                                 'quantity' : $('#quantity').val()
-                        },
+                        }),
+                        contentType: "application/json",
                         url : '/api/modifyrecord/assistant/'
                 }).done(function(data){
                         console.log(data)
