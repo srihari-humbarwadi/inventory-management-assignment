@@ -64,6 +64,9 @@ $(document).ready(function(){
                         contentType: "application/json",
                         url : '/api/modifyrecord/assistant/'
                 }).done(function(data){
+                        if (data['Status'] == 'ok'){
+                            window.location = '/view'
+                        }
                         console.log(data)
                 });
                 event.preventDefault();

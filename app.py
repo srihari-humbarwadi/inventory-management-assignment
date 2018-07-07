@@ -113,7 +113,7 @@ def addrecord():
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
-		'status' : 'ok',
+		'Status' : 'ok',
 		'name' : name,
 		'vendor' : vendor,
 		'mrp' : mrp,
@@ -140,7 +140,7 @@ def addrecordassistant():
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
-		'status' : 'ok',
+		'Status' : 'ok',
 		'name' : name,
 		'vendor' : vendor,
 		'mrp' : mrp,
@@ -187,7 +187,7 @@ def login():
 				session['username'] = username
 				session['role'] = role
 				flash('Login success', 'success')
-				return redirect(url_for('inventory'))
+				return redirect(url_for('dashboard'))
 			else:
 				error = 'Invalid username/password'
 				return render_template('login.html', error=error, form=form)
@@ -258,7 +258,7 @@ def modifyrecord():
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
-		'status' : 'ok',
+		'Status' : 'ok',
 		'name' : name,
 		'quantity' : quantity,
 		'status' : status
@@ -277,7 +277,7 @@ def modifyrecordassistant():
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
-		'status' : 'ok',
+		'Status' : 'ok',
 		'name' : name,
 		'quantity' : quantity,
 		'status' : status
@@ -313,10 +313,10 @@ def logout():
 	return redirect(url_for('login'))
 
 
-@app.route('/inventory')
+@app.route('/dashboard')
 @is_logged_in
-def inventory():
-	return render_template('inventory.html')
+def dashboard():
+	return render_template('dashboard.html')
 
 
 
