@@ -252,9 +252,10 @@ def modifyrecord():
 	name = content['name']
 	vendor = content['vendor']
 	quantity = content['quantity']
+	mrp = content['mrp']
 	status = 'Approved'
 	cur = mysql.connection.cursor()
-	cur.execute('UPDATE products SET quantity = %s, status = %s WHERE name = %s AND vendor = %s', [quantity, status, name, vendor])
+	cur.execute('UPDATE products SET quantity = %s, mrp = %s, status = %s WHERE name = %s AND vendor = %s', [quantity, mrp, status, name, vendor])
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
@@ -271,9 +272,10 @@ def modifyrecordassistant():
 	name = content['name']
 	vendor = content['vendor']
 	quantity = content['quantity']
+	mrp = content['mrp']
 	status = 'Pending modification'
 	cur = mysql.connection.cursor()
-	cur.execute('UPDATE products SET quantity = %s, status = %s WHERE name = %s AND vendor = %s', [quantity, status, name, vendor])
+	cur.execute('UPDATE products SET quantity = %s, mrp = %s, status = %s WHERE name = %s AND vendor = %s', [quantity, mrp, status, name, vendor])
 	mysql.connection.commit()
 	cur.close()
 	return jsonify({
@@ -390,4 +392,4 @@ def delete():
 
 if __name__ == '__main__':
 	app.secret_key = 'isthissafe?'
-	app.run(debug=True)
+	app.run(debug=True, host='0.0.0.0')

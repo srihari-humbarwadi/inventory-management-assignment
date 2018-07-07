@@ -2,7 +2,7 @@
 {% block body %}
 {% from "includes/_formhelper.html" import render_field %}
 
-<div class="container col-lg-10 col-md 12 col-sm-12 col-xs-12">
+<div class="container col-lg-10 col-md-12 col-sm-5 col-xs-5">
 <table id="example" class="row-border hover" style="width:100%">
         <thead>
             <tr>
@@ -28,7 +28,6 @@
     <script type="text/javascript">
             $(document).ready(function() {
                 $('#example').DataTable( {
-                    "responsive": true,
                     "ajax": {
                         "url": "/api/get/",
                         "dataSrc": ""

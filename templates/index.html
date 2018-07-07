@@ -6,6 +6,9 @@
 	{% if session.logged_in == NULL %}
   		<a href="/register" class="btn btn-primary btn-lg">Register</a>
   		<a href="/login" class="btn btn-success btn-lg">Login</a>
+	{% else %}  		
+		<a href="/dashboard" class="btn btn-primary btn-lg">Dashboard</a>
+  		<a href="/view" class="btn btn-success btn-lg">View Records</a>
 	{% endif %}
 </div>
 {% endblock %}
