@@ -14,6 +14,8 @@
                 <th>Cost</th>
                 <th>Quantity</th>
                 <th>Status</th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
     </table>
@@ -35,8 +37,21 @@
                         { "data": "batch_date" },
                         { "data": "mrp" },
                         { "data": "quantity" },
-                        { "data": "status" }
+                        { "data": "status" },
+                        { "data": null,"defaultContent": "<button id='delete' class='btn btn-primary' >Delete</button>"},
+                        { "data": null,"defaultContent": "<button id ='modify' class='btn btn-success' >Modify</button>"}
                     ]
+                } );
+                var table = $('#example').DataTable();
+                $('#example tbody').on( 'click', '#delete', function () {
+                    console.log('delete clicked')
+                    console.log( table.row( $(this).parents('tr') ).data() );
+                } );
+                $('#example tbody').on( 'click', '#modify', function () {
+                    console.log('Modify clicked');
+                    data = table.row( $(this).parents('tr') ).data();
+                    console.log('redirecting to ' + "/modify/" + data["id"] + "/" + data["name"]);
+                    window.location = "/modify/" + data["id"] + "/" + data["name"]
                 } );
             } );
 </script>

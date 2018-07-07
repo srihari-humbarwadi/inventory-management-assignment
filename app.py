@@ -203,6 +203,67 @@ def viewpending():
 	return render_template('view_pending.html')
 
 
+@app.route('/modify/<id>/<name>')
+@is_logged_in
+def modify(id, name):
+	cur = mysql.connection.cursor()
+	current_user = session['username']
+	uresult = cur.execute('SELECT * from users WHERE username = %s', [current_user])
+	user = cur.fetchone()
+	user_role = user['role']
+	results = cur.execute('SELECT * FROM products WHERE id = %s AND name = %s', [id, name])
+	if results > 0:
+		data = cur.fetchone()
+		cur.close()
+	else:
+		cur.close()
+		error = 'Something went wrrong, please try again'
+		return render_template('view.html', error=error)
+	form = AddInventoryRecord(request.form)
+	if user_role == 0:
+		cur.close()
+		return render_template('modify.html', form=form, data=data)
+	elif user_role == 1:
+		cur.close()
+		return render_template('modifya.html', form=form, data=data)
+
+
+@app.route('/api/modifyrecord/', methods=['POST'])
+@is_manager
+def modifyrecord():
+	name = request.form['name']
+	vendor = request.form['vendor']
+	quantity = request.form['quantity']
+	status = 'Approved'
+	cur = mysql.connection.cursor()
+	cur.execute('UPDATE products SET quantity = %s, status = %s WHERE name = %s AND vendor = %s', [quantity, status, name, vendor])
+	mysql.connection.commit()
+	cur.close()
+	return jsonify({
+		'name' : name,
+		'quantity' : quantity,
+		'status' : status
+		})
+
+@app.route('/api/modifyrecord/assistant/', methods=['POST'])
+@is_logged_in
+def modifyrecordassistant():
+	name = request.form['name']
+	vendor = request.form['vendor']
+	quantity = request.form['quantity']
+	status = 'Pending Approval'
+	cur = mysql.connection.cursor()
+	cur.execute('UPDATE products SET quantity = %s, status = %s WHERE name = %s AND vendor = %s', [quantity, status, name, vendor])
+	mysql.connection.commit()
+	cur.close()
+	return jsonify({
+		'name' : name,
+		'quantity' : quantity,
+		'status' : status
+		})
+
+
+
 @app.route('/api/get/')
 @is_logged_in
 def get():
@@ -217,7 +278,7 @@ def get():
 @is_logged_in
 def getpending():
 	cur = mysql.connection.cursor()
-	results = cur.execute('SELECT * FROM products WHERE status = %s', ['Pending Approval'])
+	results = cur.execute('SELECT * FROM products WHERE NOT status = %s', ['Approved'])
 	data = cur.fetchall()
 	cur.close()
 	return jsonify(data)
